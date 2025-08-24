@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>How It Works • InsuraSure</title>
+
+  <!-- Materialize & Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/materialize.css') }}" rel="stylesheet" media="screen,projection"/>
+
+  <style>
+    body { background:#f7f9fc; }
+    .navbar-gradient { background:linear-gradient(90deg,#4ec587,#055247); }
+    .section-title { display:flex; align-items:center; gap:10px; }
+    .section-title i { font-size: 1.6rem; }
+    .card-rounded { border-radius:16px; }
+    pre {
+      background:#0a0f14; color:#e7f1ff; border-radius:12px;
+      padding:16px; overflow:auto; line-height:1.4; font-size:.95rem;
+    }
+    .pill { display:inline-block; padding:4px 10px; border-radius:999px; font-size:.85rem; font-weight:600; }
+    .pill-up { background:#ffebee; color:#c62828; }
+    .pill-down { background:#e8f5e9; color:#2e7d32; }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar-gradient" role="navigation">
+    <div class="nav-wrapper container">
+      <a href="{{ url_for('home') }}" class="brand-logo" style="font-weight:700;">InsuraSure</a>
+
+      <!-- Desktop Menu -->
+      <ul class="right hide-on-med-and-down">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('bmi') }}">BMI Calculator</a></li>
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li class="active"><a href="{{ url_for('how_it_works') }}">How It Works</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+
+      <!-- Mobile Menu -->
+      <ul id="nav-mobile" class="sidenav">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('bmi') }}">BMI Calculator</a></li>
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li class="active"><a href="{{ url_for('how_it_works') }}">How It Works</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger">
+        <i class="material-icons">menu</i>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- App flow -->
+    <div class="section">
+      <div class="section-title">
+        <i class="material-icons cyan-text text-darken-2">timeline</i>
+        <h5>End-to-End Flow</h5>
+      </div>
+      <ol class="browser-default">
+        <li>User enters details (age, sex, BMI, smoker, children, region).</li>
+        <li>Data is validated and categorical fields are encoded to numeric codes.</li>
+        <li>Random Forest model predicts the premium.</li>
+        <li>SHAP explains the top drivers (↑ increase / ↓ decrease).</li>
+        <li>Isolation Forest checks if the profile is unusually rare and shows a non-blocking warning if needed.</li>
+        <li>Results page displays the estimate, baseline, explanations, and (if flagged) an anomaly banner.</li>
+      </ol>
+    </div>
+
+    <!-- Data & preprocessing -->
+    <div class="section">
+      <div class="section-title">
+        <i class="material-icons deep-orange-text text-darken-2">dataset</i>
+        <h5>Data & Preprocessing</h5>
+      </div>
+      <ul class="browser-default" style="margin-left:18px;">
+        <li><b>Dataset:</b> Common health insurance dataset (features: age, sex, BMI, children, smoker, region; target: charges).</li>
+        <li><b>Encoding:</b> sex → {male:1, female:0}; smoker → {yes:1, no:0}; region → {NE:0, NW:1, SE:2, SW:3}.</li>
+        <li><b>Split:</b> 80/20 train-test.</li>
+        <li><b>Scaling:</b> not strictly required for tree models; numeric fields are used as-is.</li>
+      </ul>
+    </div>
+
+    <!-- Premium model -->
+    <div class="section">
+      <div class="section-title">
+        <i class="material-icons green-text text-darken-2">science</i>
+        <h5>Premium Model — Random Forest Regressor</h5>
+      </div>
+      <div class="card card-rounded">
+        <div class="card-content">
+          <p>
+            Random Forest is an ensemble of decision trees that reduces variance and generalizes well on tabular data.
+            We tune key hyperparameters via GridSearchCV (e.g., <code>n_estimators</code>, <code>max_depth</code>, <code>min_samples_split</code>),
+            select the best model, and persist it as <code>rf_tuned.pkl</code>.
+          </p>
+          <pre><code># Pseudocode for training
+X = df[['age','sex','bmi','children','smoker','region']]
+y = df['charges']
+# encode categoricals to numeric as used in the app
+# train/test split
+# GridSearchCV(RandomForestRegressor(...), param_grid=...) → best_estimator_
+pickle.dump(best_estimator_, open('rf_tuned.pkl','wb'))
+</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Explainability -->
+    <div class="section">
+      <div class="section-title">
+        <i class="material-icons amber-text text-darken-2">lightbulb</i>
+        <h5>Explainability — SHAP</h5>
+      </div>
+      <p>
+        For each prediction, we compute SHAP values to quantify how each feature contributed. The UI shows the top 3:
+        <span class="pill pill-up">↑ Smoker +₹X</span>
+        <span class="pill pill-up">↑ BMI +₹Y</span>
+        <span class="pill pill-down">↓ Younger Age −₹Z</span>.
+        We also display the model’s baseline (expected value) for context.
+      </p>
+    </div>
+
+    <!-- Anomaly detector -->
+    <div class="section">
+      <div class="section-title">
+        <i class="material-icons red-text text-darken-2">report</i>
+        <h5>Anomaly Detection — Isolation Forest</h5>
+      </div>
+      <p>
+        We train an unsupervised Isolation Forest on the same feature schema with contamination ≈ 0.05.
+        At inference, we compute a decision score; if the profile is predicted as an outlier, we show a gentle warning
+        (does not block the prediction). Model persisted as <code>fraud_iforest.pkl</code>.
+      </p>
+      <pre><code># Pseudocode for anomaly model
+X_if = encoded_features  # same columns as premium model
+iforest = IsolationForest(contamination=0.05, random_state=42).fit(X_if)
+pickle.dump(iforest, open('fraud_iforest.pkl','wb'))
+</code></pre>
+    </div>
+
+    <!-- Limitations & FAQ -->
+    <div class="section">
+      <div class="section-title">
+        <i class="material-icons grey-text text-darken-2">help_outline</i>
+        <h5>Limitations & FAQs</h5>
+      </div>
+      <ul class="browser-default" style="margin-left:18px;">
+        <li><b>Is this a real quote?</b> No. It’s an educational estimate based on a historical dataset and a trained model.</li>
+        <li><b>Will values match my insurer?</b> Not necessarily—insurers use proprietary risk models and underwriting rules.</li>
+        <li><b>Why was my input flagged?</b> It may be rare compared to training data (e.g., extreme BMI + young age). You can still view the prediction.</li>
+        <li><b>Can I compare scenarios?</b> Coming soon (scenario builder & projections).</li>
+      </ul>
+    </div>
+
+    <!-- CTA -->
+    <div class="section" style="margin-bottom:40px;">
+      <a href="{{ url_for('home') }}" class="btn waves-effect waves-light light-blue darken-3" style="border-radius:999px;">
+        <i class="material-icons left">arrow_back</i>Try a Quote
+      </a>
+      <a href="{{ url_for('bmi') }}" class="btn-flat waves-effect" style="border-radius:999px;">Open BMI Calculator</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="page-footer" style="background-color:#055247;">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">About</h5>
+          <p class="grey-text text-lighten-4">
+            InsuraSure estimates health insurance costs using machine learning.
+            Your inputs remain local to this session.
+          </p>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Resources</h5>
+          <ul>
+            <li><a class="white-text" href="{{ url_for('about') }}">About</a></li>
+            <li><a class="white-text" href="{{ url_for('how_it_works') }}">How It Works</a></li>
+            <li><a class="white-text" href="{{ url_for('contact') }}">Contact</a></li>
+          </ul>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Connect</h5>
+          <ul>
+            <li><a class="white-text" href="https://www.linkedin.com/in/gayatri-nagi-2a586325a/">LinkedIn</a></li>
+            <li><a class="white-text" href="https://github.com/gayatrinagi">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">Made with <span style="opacity:.9;">Materialize</span></div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
+    });
+  </script>
+</body>
+</html>

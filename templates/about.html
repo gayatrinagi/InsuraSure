@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>About • InsuraSure</title>
+
+  <!-- Materialize & Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/materialize.css') }}" rel="stylesheet" media="screen,projection"/>
+
+  <style>
+    body { background:#f7f9fc; }
+    .navbar-gradient { background:linear-gradient(90deg,#4ec587,#055247); }
+    .page-hero {
+      background: linear-gradient(135deg, rgba(78,197,135,.15), rgba(5,82,71,.15));
+      border-radius: 18px; padding: 28px 24px; margin-top: 20px;
+    }
+    .card-rounded { border-radius:16px; }
+    .kpi {
+      background:white; border-radius:14px; padding:10px 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      display:inline-flex; align-items:center; gap:10px; margin:4px 6px 0 0;
+    }
+    .section-title { display:flex; align-items:center; gap:10px; }
+    .section-title i { font-size: 1.6rem; }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar-gradient" role="navigation">
+    <div class="nav-wrapper container">
+      <a href="{{ url_for('home') }}" class="brand-logo" style="font-weight:700;">InsuraSure</a>
+
+      <!-- Desktop Menu -->
+      <ul class="right hide-on-med-and-down">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('bmi') }}">BMI Calculator</a></li>
+        <li class="active"><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="{{ url_for('how_it_works') }}">How It Works</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+
+      <!-- Mobile Menu -->
+      <ul id="nav-mobile" class="sidenav">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('bmi') }}">BMI Calculator</a></li>
+        <li class="active"><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="{{ url_for('how_it_works') }}">How It Works</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger">
+        <i class="material-icons">menu</i>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="container">
+    <div class="page-hero">
+      <div class="row" style="margin-bottom:0;">
+        <div class="col s12 m8">
+          <h4 class="teal-text text-darken-2" style="margin-top:0;">About InsuraSure</h4>
+          <p>
+            <b>InsuraSure</b> is a machine learning–powered web app that predicts
+            <b>health insurance premiums</b> from a small set of inputs (age, sex, BMI, smoker, children, region).
+            It goes beyond a static calculator with <b>explainable AI</b> and a built-in <b>BMI calculator</b>,
+            helping you understand <i>what</i> your premium could be and <i>why</i>.
+          </p>
+          <div>
+            <span class="kpi"><i class="material-icons teal-text">insights</i> ML-based Premiums</span>
+            <span class="kpi"><i class="material-icons amber-text">lightbulb</i> SHAP Explanations</span>
+            <span class="kpi"><i class="material-icons red-text">warning</i> Anomaly Flags</span>
+            <span class="kpi"><i class="material-icons blue-text">monitor_weight</i> BMI Tools</span>
+          </div>
+        </div>
+        <div class="col s12 m4 right-align" style="display:flex; align-items:flex-start; justify-content:flex-end; gap:10px;">
+          <a href="{{ url_for('home') }}" class="btn waves-effect waves-light light-blue darken-3" style="border-radius:999px;">
+            <i class="material-icons left">arrow_back</i>Try a Quote
+          </a>
+          <a href="{{ url_for('bmi') }}" class="btn-flat waves-effect" style="border-radius:999px;">BMI Calculator</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- What it does -->
+    <div class="section">
+      <div class="section-title">
+        <i class="material-icons blue-text text-darken-2">star</i>
+        <h5>What InsuraSure Does</h5>
+      </div>
+      <div class="row">
+        <div class="col s12 m6">
+          <div class="card card-rounded">
+            <div class="card-content">
+              <span class="card-title"><i class="material-icons left teal-text">trending_up</i> Premium Prediction</span>
+              <p>Estimate your expected premium instantly based on your profile. Great for exploring scenarios before you shop plans.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m6">
+          <div class="card card-rounded">
+            <div class="card-content">
+              <span class="card-title"><i class="material-icons left amber-text">lightbulb_outline</i> Why This Amount?</span>
+              <p>Our explainability panel shows the <b>top factors</b> pushing your premium up or down, so you can make informed decisions.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m6">
+          <div class="card card-rounded">
+            <div class="card-content">
+              <span class="card-title"><i class="material-icons left red-text">report</i> Unusual Input Alerts</span>
+              <p>We flag unusually rare input combinations with a gentle warning—useful for catching typos or unrealistic scenarios.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m6">
+          <div class="card card-rounded">
+            <div class="card-content">
+              <span class="card-title"><i class="material-icons left blue-text">monitor_weight</i> Built-in BMI</span>
+              <p>Calculate BMI quickly and use it to explore “what-if” changes in your predicted premium.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Who it's for / Why it matters -->
+    <div class="section">
+      <div class="section-title">
+        <i class="material-icons green-text text-darken-2">groups</i>
+        <h5>Who It’s For & Why It Matters</h5>
+      </div>
+      <p>
+        Individuals comparing plans, students learning ML for real-world finance/health, and anyone curious about how lifestyle
+        affects insurance costs. By connecting <b>health metrics → premium impact</b>, InsuraSure helps you
+        <b>Predict. Protect. Prepare.</b>
+      </p>
+    </div>
+
+    <!-- Roadmap (light; technical details moved to How It Works) -->
+    <div class="section" style="margin-bottom:40px;">
+      <div class="section-title">
+        <i class="material-icons indigo-text text-darken-2">rocket_launch</i>
+        <h5>Roadmap</h5>
+      </div>
+      <ul class="browser-default" style="margin-left:18px;">
+        <li>Premium <b>projection</b> (simulate 5–10 years).</li>
+        <li><b>Scenario builder</b> to compare lifestyle changes side-by-side.</li>
+        <li><b>Quote history</b> & trends; optional login.</li>
+        <li><b>Downloadable reports</b> for sharing.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="page-footer" style="background-color:#055247;">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">About</h5>
+          <p class="grey-text text-lighten-4">
+            InsuraSure estimates health insurance costs using machine learning.
+            Your inputs remain local to this session.
+          </p>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Resources</h5>
+          <ul>
+            <li><a class="white-text" href="{{ url_for('about') }}">About</a></li>
+            <li><a class="white-text" href="{{ url_for('how_it_works') }}">How It Works</a></li>
+            <li><a class="white-text" href="{{ url_for('contact') }}">Contact</a></li>
+          </ul>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Connect</h5>
+          <ul>
+            <li><a class="white-text" href="https://www.linkedin.com/in/gayatri-nagi-2a586325a/">LinkedIn</a></li>
+            <li><a class="white-text" href="https://github.com/gayatrinagi">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">Made with <span style="opacity:.9;">Materialize</span></div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
+    });
+  </script>
+</body>
+</html>

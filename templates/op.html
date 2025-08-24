@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Prediction Result • InsuraSure</title>
+
+  <!-- Icons & Materialize -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/materialize.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  <style>
+    body { background: #f7f9fc; }
+    .navbar-gradient { background: linear-gradient(90deg, #4ec587, #055247); } /* match home */
+    .result-card { border-radius: 16px; }
+    .pill {
+      display:inline-block; padding: 4px 10px; border-radius: 999px;
+      font-size: 0.85rem; font-weight: 600;
+    }
+    .pill-up   { background: #ffebee; color: #c62828; }  /* ↑ cost */
+    .pill-down { background: #e8f5e9; color: #2e7d32; }  /* ↓ cost */
+    .baseline { font-size: 0.95rem; color: #546e7a; }
+    .divider-dashed { border-top: 1px dashed #e0e0e0; margin: 14px 0; }
+    .subtle { color:#607d8b; font-size: .9rem; }
+    .btn-rounded { border-radius: 999px; }
+    .list-tight li { margin: 6px 0; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar-gradient" role="navigation">
+    <div class="nav-wrapper container">
+      <a href="{{ url_for('home') }}" class="brand-logo" style="font-weight:700;">InsuraSure</a>
+
+      <!-- Desktop Menu -->
+      <ul class="right hide-on-med-and-down">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('bmi') }}">BMI Calculator</a></li>
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="{{ url_for('how_it_works') }}">How It Works</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+
+      <!-- Mobile Menu -->
+      <ul id="nav-mobile" class="sidenav">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('bmi') }}">BMI Calculator</a></li>
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="{{ url_for('how_it_works') }}">How It Works</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger">
+        <i class="material-icons">menu</i>
+      </a>
+    </div>
+  </nav>
+
+  <div class="section" id="index-banner">
+    <div class="container">
+      <br>
+
+      <!-- Error banner (validation) -->
+      {% if error_msg %}
+      <div class="card-panel red lighten-4 red-text text-darken-4" style="border-radius:10px;">
+        <i class="material-icons" style="vertical-align:middle;">error_outline</i>
+        <span style="margin-left:6px;">{{ error_msg }}</span>
+      </div>
+      {% endif %}
+
+      <!-- Fraud/Anomaly banner (if flagged) -->
+      {% if fraud_flag %}
+      <div class="card-panel red lighten-5" style="border-radius:10px; border:1px solid #ffcdd2; margin-bottom:14px;">
+        <span style="color:#b71c1c; font-weight:600;">
+          <i class="material-icons tiny" style="vertical-align:middle;">warning</i>
+          Potential Anomaly
+        </span>
+        {% if fraud_msg %}
+          <div style="color:#b71c1c; margin-top:4px;">{{ fraud_msg }}</div>
+        {% endif %}
+        {% if fraud_score is not none %}
+          <div style="color:#b71c1c; font-size:.9rem; opacity:.85; margin-top:2px;">
+            Anomaly score: {{ fraud_score }} (lower means more unusual)
+          </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Result Card -->
+      <div class="card white result-card z-depth-2">
+        <div class="card-content">
+
+          <span class="card-title" style="display:flex; align-items:center; gap:10px;">
+            <i class="material-icons blue-text text-darken-2">insights</i>
+            Prediction Summary
+          </span>
+
+          <!-- Predicted amount -->
+          <div class="row" style="margin-top:10px;">
+            <div class="col s12 m7">
+              <h4 class="red-text text-accent-3" style="margin:0;">
+                {{ pred }}
+                {% if fraud_flag %}
+                  <span class="new badge red" data-badge-caption="Unusual Input" style="margin-left:10px;"></span>
+                {% endif %}
+              </h4>
+              <p class="subtle">This is the estimated premium based on your inputs.</p>
+            </div>
+            <div class="col s12 m5 right-align">
+              <a href="{{ url_for('home') }}" class="btn btn-rounded light-blue darken-3 waves-effect waves-light">
+                <i class="material-icons left">arrow_back</i> New Quote
+              </a>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="divider-dashed"></div>
+
+          <!-- Why this premium? -->
+          {% if top_factors and top_factors|length > 0 %}
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+              <i class="material-icons amber-text text-darken-2">lightbulb</i>
+              <span class="grey-text text-darken-3" style="font-weight:600;">Why this premium?</span>
+            </div>
+
+            <ul class="list-tight">
+              {% for f in top_factors %}
+                <li>
+                  <span style="font-weight:600;">{{ f.name }}</span>
+                  {% if f.raw >= 0 %}
+                    <span class="pill pill-up">↑ {{ f.signed_amount }}</span>
+                  {% else %}
+                    <span class="pill pill-down">↓ {{ f.signed_amount | replace('−','') }}</span>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+
+            {% if base_value is not none %}
+              <p class="baseline">
+                <i class="material-icons tiny" style="vertical-align:middle;">show_chart</i>
+                Baseline (model’s expected value):
+                <strong>₹{{ "{:,.0f}".format(base_value) }}</strong>.
+                Your inputs push this up/down by the amounts above.
+              </p>
+            {% endif %}
+          {% else %}
+            <p class="subtle">
+              <i class="material-icons tiny" style="vertical-align:middle;">info</i>
+              Explanation not available for this input.
+            </p>
+          {% endif %}
+        </div>
+
+        <!-- Optional footer tips -->
+        <div class="card-action" style="display:flex; gap:10px; flex-wrap:wrap;">
+          <span class="grey-text text-darken-2">
+            <i class="material-icons tiny" style="vertical-align:middle;">help_outline</i>
+            Tip: Try a new quote with different inputs to see how the factors change.
+          </span>
+        </div>
+      </div>
+
+      <br><br>
+    </div>
+  </div>
+
+  <!-- Materialize JS -->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
+    });
+  </script>
+</body>
+</html>

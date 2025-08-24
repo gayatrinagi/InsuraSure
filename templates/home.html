@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>InsuraSure</title>
+
+  <!-- Materialize & Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/materialize.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+  <style>
+    body{ background:#f7f9fc; }
+    .navbar-gradient{ background:linear-gradient(90deg,#4ec587,#055247); }
+    .hero-title{ font-weight:700; letter-spacing:.2px; }
+    .card-rounded{ border-radius:16px; }
+    .helper{ color:#607d8b; font-size:.9rem; }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar-gradient" role="navigation">
+    <div class="nav-wrapper container">
+
+      <!-- Brand -->
+      <a href="{{ url_for('home') }}" class="brand-logo" style="font-weight:700;">
+        InsuraSure
+      </a>
+
+      <!-- Desktop Menu -->
+      <ul class="right hide-on-med-and-down">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('bmi') }}">BMI Calculator</a></li>
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="{{ url_for('how_it_works') }}">How It Works</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+
+      <!-- Mobile Menu -->
+      <ul id="nav-mobile" class="sidenav">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('bmi') }}">BMI Calculator</a></li>
+        <li><a href="{{ url_for('about') }}">About</a></li>
+        <li><a href="{{ url_for('how_it_works') }}">How It Works</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger">
+        <i class="material-icons">menu</i>
+      </a>
+
+    </div>
+  </nav>
+
+  <!-- Hero + Form -->
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h3 class="header center hero-title teal-text text-darken-2">Health Insurance Cost Prediction</h3>
+      <p class="center helper">Enter your details to estimate your premium. Fields marked * are required.</p>
+
+      <div class="row">
+        <form action="{{ url_for('predict') }}" method="post" class="col s12">
+          <div class="card white card-rounded z-depth-2">
+            <div class="card-content">
+
+              <div class="row">
+                <!-- Age -->
+                <div class="input-field col s12 m4">
+                  <i class="material-icons prefix">person</i>
+                  <input id="age" name="age" type="number" min="0" max="120" step="1" class="validate" required>
+                  <label for="age"><b>Age *</b></label>
+                  <span class="helper-text" data-error="Enter a valid age (0–120)">Years</span>
+                </div>
+
+                <!-- Sex -->
+                <div class="input-field col s12 m4">
+                  <i class="material-icons prefix">wc</i>
+                  <select id="sex" name="sex" required>
+                    <option value="" disabled selected>Choose sex</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                  <label for="sex"><b>Sex *</b></label>
+                </div>
+
+                <!-- BMI -->
+                <div class="input-field col s12 m4">
+                  <i class="material-icons prefix">monitor_weight</i>
+                  <input id="bmi" name="bmi" type="number" step="0.1" min="10" max="60" class="validate" required>
+                  <label for="bmi"><b>BMI *</b></label>
+                  <span class="helper-text">e.g., 24.7</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <!-- Children -->
+                <div class="input-field col s12 m4">
+                  <i class="material-icons prefix">child_friendly</i>
+                  <input id="children" name="children" type="number" min="0" max="10" step="1" class="validate" required>
+                  <label for="children"><b>Children *</b></label>
+                  <span class="helper-text">Number of dependent children</span>
+                </div>
+
+                <!-- Smoker -->
+                <div class="input-field col s12 m4">
+                  <i class="material-icons prefix">smoking_rooms</i>
+                  <select id="smoker" name="smoker" required>
+                    <option value="" disabled selected>Do you smoke?</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                  <label for="smoker"><b>Smoking Status *</b></label>
+                </div>
+
+                <!-- Region -->
+                <div class="input-field col s12 m4">
+                  <i class="material-icons prefix">map</i>
+                  <select id="region" name="region" required>
+                    <option value="" disabled selected>Select region</option>
+                    <option value="northeast">Northeast</option>
+                    <option value="northwest">Northwest</option>
+                    <option value="southeast">Southeast</option>
+                    <option value="southwest">Southwest</option>
+                  </select>
+                  <label for="region"><b>Region *</b></label>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="card-action right-align">
+              <button type="submit" class="btn-large light-blue darken-3 waves-effect waves-light" style="border-radius:999px;">
+                <i class="material-icons left">insights</i>
+                Get Premium
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <br><br>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="page-footer" style="background-color:#055247;">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">About</h5>
+          <p class="grey-text text-lighten-4">
+            InsuraSure estimates health insurance costs using machine learning.
+            Your inputs remain local to this session.
+          </p>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Resources</h5>
+          <ul>
+            <li><a class="white-text" href="{{ url_for('about') }}">About</a></li>
+            <li><a class="white-text" href="{{ url_for('contact') }}">Contact</a></li>
+          </ul>
+        </div>
+        <div class="col l3 s12">
+          <h5 class="white-text">Connect</h5>
+          <ul>
+            <li><a class="white-text" href="https://www.linkedin.com/in/gayatri-nagi-2a586325a/">LinkedIn</a></li>
+            <li><a class="white-text" href="https://github.com/gayatrinagi">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">Made with <span style="opacity:.9;">Materialize</span></div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{{ url_for('static', filename='js/materialize.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      M.FormSelect.init(document.querySelectorAll('select'), {});
+      M.Sidenav.init(document.querySelectorAll('.sidenav'), {});
+    });
+  </script>
+</body>
+</html>
