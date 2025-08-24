@@ -4,7 +4,8 @@
 
 InsuraSure is a machine learning–powered web application that predicts health insurance premiums based on lifestyle and health metrics.
 
-✅ Try the live app here → [(https://insurasure-2.onrender.com/)]
+✅ T[Try the live app here](https://insurasure-2.onrender.com/)
+
 
 ***
 
